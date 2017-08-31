@@ -8,18 +8,28 @@ import binascii
 import hashlib
 import json
 from ctypes import *
+from cffi import FFI
 
-lib = cdll.LoadLibrary('./libpure.so')
-lib.py_result.restype = c_char_p
-py_result = lib.py_result
-py_result.restype = c_char_p
+ffi = FFI()
+
+lib = ffi.dlopen('./libpure.so')
+ffi.cdef('''
+char *py_result(const char *blobIn, const int nonceStart, const int nonceEnd, const char *targetStr);
+''')
+
+#lib = cdll.LoadLibrary('./libpure.so')
+#lib.py_result.restype = c_char_p
+#py_result = lib.py_result
+#py_result.restype = c_char_p
 
 app = Flask(__name__)
 
 
 @app.route('/test')
 def qqruqu():
-    out = py_result("0505f49384cb054b16f69fc108640a8f627e268f51d897b4f7c74eafe9777fefd9b04abed9eec500000000e321bd84e6b2008879a16497bf6ee58644a36146b63de7c217e7f467b05d67fa01", 164, 166)
+#    out = py_result("0505f49384cb054b16f69fc108640a8f627e268f51d897b4f7c74eafe9777fefd9b04abed9eec500000000e321bd84e6b2008879a16497bf6ee58644a36146b63de7c217e7f467b05d67fa01", 164, 166)
+    rrr = lib.py_result("0505f49384cb054b16f69fc108640a8f627e268f51d897b4f7c74eafe9777fefd9b04abed9eec500000000e321bd84e6b2008879a16497bf6ee58644a36146b63de7c217e7f467b05d67fa01", 160, 170, "e4a63d00")
+    out = ffi.string(rrr)
     return out
 
 
